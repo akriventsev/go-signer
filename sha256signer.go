@@ -21,14 +21,14 @@ func (signer Sha256Signer) Sign(s Signable, key string) ([]byte, error) {
 		return nil, fmt.Errorf("invalid private Key")
 	}
 
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	privateKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
 		return nil, fmt.Errorf("invalid Private Key")
 	}
 
 	digest := sha256.Sum256([]byte(s.SignString()))
 
-	signature, signErr := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, digest[:])
+	signature, signErr := rsa.SignPKCS1v15(rand.Reader, privateKey.(*rsa.PrivateKey), crypto.SHA256, digest[:])
 
 	if signErr != nil {
 		return nil, fmt.Errorf("could not sign message:%s", signErr.Error())
